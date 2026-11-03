@@ -23,6 +23,7 @@
 //    stalls. Do not remove it.
 
 #include "openmouse.h"
+#include "obs_operator.h"
 #include <shellapi.h>   // CommandLineToArgvW — not pulled in by WIN32_LEAN_AND_MEAN
 #include <atomic>
 #include <set>
@@ -419,6 +420,11 @@ bool OwnerDragging() {
 }
 
 void HandleButton(int seat, USHORT flags, USHORT data) {
+    // A reserved OBS operator never claims foreground or injects clicks.
+    if (seat == g_cfg.obsOperatorSeat) {
+        ObsOperatorMouse(g_seats[seat].pos, flags);
+        return;
+    }
     // Physical arrival time, captured before any settle sleeps distort it —
     // the anti-compression pacing below compares against this.
     const DWORD pressArrive = GetTickCount();
@@ -1931,6 +1937,13 @@ int RunMain(HINSTANCE inst) {
     ClipCursor(nullptr);
 
     g_cfg.Load(Config::DefaultPath());
+    if (g_cfg.obsOperatorSeat >= 1 && g_cfg.obsOperatorSeat < g_cfg.seatCount &&
+        g_cfg.captureKeyboards) {
+        // Keyboard steering cannot safely isolate two physical keyboards.
+        // In OBS mode it would steal foreground focus from the game.
+        g_cfg.captureKeyboards = false;
+        LogLine(L"[obs-operator] disabled keyboard steering to protect game focus");
+    }
 
     WNDCLASSEXW wc{};
     wc.cbSize        = sizeof(wc);
@@ -1996,6 +2009,16 @@ int RunMain(HINSTANCE inst) {
         return 1;
     }
 
+    if (g_cfg.obsOperatorSeat >= 1 && g_cfg.obsOperatorSeat < g_cfg.seatCount) {
+        if (!ObsOperatorStart(inst, (unsigned short)g_cfg.obsBridgePort)) {
+            LogLine(L"[obs-operator] HUD creation failed: seat returned to normal mouse mode");
+            g_cfg.obsOperatorSeat = -1;
+        } else {
+            LogLine(L"[obs-operator] seat %d reserved for OBS; clicks not injected",
+                    g_cfg.obsOperatorSeat);
+        }
+    }
+
     TrayAdd(g_hwnd);
     SpawnJanitor();
 
@@ -2026,6 +2049,7 @@ int RunMain(HINSTANCE inst) {
     gate.join();
     TrayRemove(g_hwnd);
     UnregisterCapture();
+    ObsOperatorStop();
     RestoreSystemCursor();
     for (int i = 0; i < kMaxSeats; ++i) g_overlay[i].Destroy();
     return 0;
