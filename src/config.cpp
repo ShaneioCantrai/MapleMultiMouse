@@ -113,6 +113,9 @@ bool Config::Load(const std::wstring& path) {
             if      (key == L"seats")             seatCount        = _wtoi(val.c_str());
             else if (key == L"capture_keyboards") captureKeyboards = (val == L"1" || val == L"true");
             else if (key == L"mark_active_seat")  markActiveSeat   = (val == L"1" || val == L"true");
+        } else if (section == L"obs") {
+            if      (key == L"operator_seat") obsOperatorSeat = _wtoi(val.c_str());
+            else if (key == L"bridge_port")  obsBridgePort = _wtoi(val.c_str());
         } else if (section == L"mouse") {
             mouseBinding[key] = _wtoi(val.c_str());
         } else if (section == L"keyboard") {
@@ -132,6 +135,8 @@ bool Config::Load(const std::wstring& path) {
     }
     if (seatCount < 1) seatCount = 1;
     if (seatCount > kMaxSeats) seatCount = kMaxSeats;
+    if (obsBridgePort < 1024 || obsBridgePort > 65535) obsBridgePort = 4456;
+    if (obsOperatorSeat < 1 || obsOperatorSeat >= seatCount) obsOperatorSeat = -1;
     return true;
 }
 
@@ -145,6 +150,11 @@ bool Config::Save(const std::wstring& path) const {
     t += L"seats=" + std::to_wstring(seatCount) + L"\n";
     t += L"capture_keyboards=" + std::wstring(captureKeyboards ? L"1" : L"0") + L"\n";
     t += L"mark_active_seat="  + std::wstring(markActiveSeat  ? L"1" : L"0") + L"\n\n";
+
+    t += L"[obs]\n";
+    t += L"; Set operator_seat=1 only after device identification and OBS bridge setup.\n";
+    t += L"operator_seat=" + std::to_wstring(obsOperatorSeat) + L"\n";
+    t += L"bridge_port=" + std::to_wstring(obsBridgePort) + L"\n\n";
 
     for (int i = 0; i < seatCount; ++i) {
         wchar_t buf[128];
