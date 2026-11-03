@@ -36,7 +36,7 @@ if not exist build mkdir build
 cl /nologo /std:c++17 /EHsc /W4 /permissive- /O2 /MT /utf-8 ^
    /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
    /Fo:build\ /Fe:%OUT% ^
-   src\main.cpp src\devices.cpp src\overlay.cpp src\config.cpp ^
+   src\main.cpp src\devices.cpp src\overlay.cpp src\config.cpp src\obs_operator.cpp ^
    /link /SUBSYSTEM:WINDOWS /ENTRY:wWinMainCRTStartup ^
-   user32.lib gdi32.lib shell32.lib ole32.lib uuid.lib advapi32.lib
+   user32.lib gdi32.lib shell32.lib ole32.lib uuid.lib advapi32.lib winhttp.lib
 exit /b %errorlevel%

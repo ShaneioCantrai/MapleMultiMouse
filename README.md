@@ -1,5 +1,7 @@
 # openMouse
 
+> **MapleMultiMouse fork:** See [MAPLE-OBS.md](MAPLE-OBS.md) for the opt-in, focus-preserving OBS operator seat. The upstream multi-pointer features below remain available unchanged by default.
+
 Multi-pointer input for Windows. Every connected mouse gets its own on-screen pointer on
 one shared desktop, so two people can work at one PC at the same time — one per monitor,
 each with their own mouse.

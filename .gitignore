@@ -21,3 +21,6 @@ cmake_install.cmake
 .claude/
 Thumbs.db
 desktop.ini
+
+# Local OBS password / bridge settings
+/obs-bridge/.env

@@ -97,6 +97,11 @@ struct Config {
 
     int  seatCount = 2;
 
+    // -1 disables the non-activating OBS operator. The operator must
+    // be a secondary seat so seat 0 keeps normal desktop control.
+    int  obsOperatorSeat = -1;
+    int  obsBridgePort = 4456;
+
     bool Load(const std::wstring& path);
     bool Save(const std::wstring& path) const;
     static std::wstring DefaultPath();

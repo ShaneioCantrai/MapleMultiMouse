@@ -1,0 +1,31 @@
+name: Build and test MapleMultiMouse
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: OBS bridge unit tests
+        run: node --test obs-bridge/test.js
+      - name: Native Windows x64 build
+        shell: cmd
+        run: build.cmd MapleMultiMouse-test.exe
+      - name: Publish test binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: MapleMultiMouse-Windows-test
+          path: MapleMultiMouse-test.exe
+          if-no-files-found: error
