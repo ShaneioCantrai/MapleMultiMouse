@@ -57,7 +57,8 @@ bool BridgeHttp(const wchar_t* method, const wchar_t* path,
 
     const wchar_t* headers = body.empty() ? WINHTTP_NO_ADDITIONAL_HEADERS
                                            : L"Content-Type: application/json\r\n";
-    if (!WinHttpSendRequest(request.handle, headers, (DWORD)-1,
+    if (!WinHttpSendRequest(request.handle, headers,
+                            body.empty() ? 0 : (DWORD)-1,
                             body.empty() ? WINHTTP_NO_REQUEST_DATA : (LPVOID)body.data(),
                             (DWORD)body.size(), (DWORD)body.size(), 0)) return false;
     if (!WinHttpReceiveResponse(request.handle, nullptr)) return false;
