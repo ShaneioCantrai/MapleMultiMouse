@@ -9,6 +9,7 @@ add_executable(openmouse WIN32
     src/devices.cpp
     src/overlay.cpp
     src/config.cpp
+    src/obs_operator.cpp
 )
 
 target_compile_definitions(openmouse PRIVATE
@@ -18,7 +19,7 @@ target_compile_definitions(openmouse PRIVATE
     NOMINMAX
 )
 
-target_link_libraries(openmouse PRIVATE user32 gdi32 shell32 ole32 uuid advapi32)
+target_link_libraries(openmouse PRIVATE user32 gdi32 shell32 ole32 uuid advapi32 winhttp)
 
 if(MSVC)
     # /utf-8: the sources are UTF-8 without a BOM. Without it MSVC assumes the
